@@ -6,21 +6,27 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/jmoiron/sqlx"
 )
 
 const (
-	TEMPLATE_PATH = "static/html"
+	TEMPLATE_PATH    = "static/html"
+	CREDENTIALS_PATH = "static/data"
 )
 
 type Context struct {
-	Test string
 }
+
+var db *sqlx.DB
 
 func main() {
 	static := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", static))
 
 	http.HandleFunc("/", templateHandler)
+
+	INIT_DB()
 
 	log.Println("Listening...")
 	http.ListenAndServe(":8080", nil)
