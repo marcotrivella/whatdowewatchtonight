@@ -19,6 +19,7 @@ type Context struct {
 }
 
 var db *sqlx.DB
+var mappaCategorie map[string][]Movie
 
 func main() {
 	static := http.FileServer(http.Dir("static"))
