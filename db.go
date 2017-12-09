@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
+	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -25,6 +28,26 @@ type Movie struct {
 	IDTMD        int    `db:"film_idtmdb"`
 	Date         string `db:"film_date"`
 	Director     string `db:"film_director"`
+	/*
+		Animazione
+		Avventura
+		Azione
+		Dramma
+		Fantasy
+		Commedia
+		Famiglia
+		Romance
+		Fantascienza
+		Crime
+		Foreign
+		Thriller
+		Musica
+		Mistero
+		Western
+		Storia
+		Guerra
+		Horror
+	*/
 }
 
 type Credentials struct {
@@ -40,8 +63,28 @@ func INIT_DB() {
 	db, err = sqlx.Connect("mysql", credentials.User+":"+credentials.Password+"@tcp(127.0.0.1:3306)/"+credentials.DBName)
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
+
+	loadFilms()
+}
+
+func loadFilms() {
+	mappaCategorie = make(map[string][]Movie)
+	films := []Movie{}
+	log.Println("Query su film")
+	err := db.Select(&films, "SELECT * FROM films.film")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println("Inizio a inserirli nella mappa in memoria")
+	for _, movie_index := range films {
+		movie_categorie := strings.Split(movie_index.Categorie, ",")
+		for _, categoria := range movie_categorie {
+			mappaCategorie[categoria] = append(mappaCategorie[categoria], movie_index)
+		}
+	}
+	log.Println("Finito di completare la mappa dei film in memoria")
 }
 
 func getCredentialsFromFile() Credentials {
@@ -58,4 +101,9 @@ func readCredentials() Credentials {
 	var c Credentials
 	json.Unmarshal(raw, &c)
 	return c
+}
+
+func random(min, max int) int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(max-min) + min
 }
