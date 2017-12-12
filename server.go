@@ -13,6 +13,7 @@ import (
 const (
 	TEMPLATE_PATH    = "static/html"
 	CREDENTIALS_PATH = "static/data"
+	MAX_FILM_PAGE    = 50
 )
 
 type Context struct {
@@ -20,6 +21,7 @@ type Context struct {
 
 var db *sqlx.DB
 var mappaCategorie map[string][]Movie
+var contatoreSeed = int64(0)
 
 func main() {
 	static := http.FileServer(http.Dir("static"))
