@@ -93,12 +93,12 @@ func loadFilms() {
 	}
 	log.Println("Finito di completare la mappa dei film in memoria")
 
-	log.Println("Test film casuali di animazione, Avventura e western")
+	log.Println("Test film casuali")
 	categorie := make([]string, 0)
-	/*categorie = append(categorie, "Horror")
-	categorie = append(categorie, "Avventura")*/
-	categorie = append(categorie, "Western")
-	movies := getRandomFilms(categorie, "2016-01-01")
+	/*categorie = append(categorie, "Horror")*/
+	categorie = append(categorie, "Avventura")
+	//categorie = append(categorie, "Western")
+	movies := getRandomFilms(categorie, "2017-01-01")
 	for _, v := range movies {
 		fmt.Println(v.Title + " - " + v.Date)
 	}
@@ -109,7 +109,7 @@ func getCredentialsFromFile() Credentials {
 }
 
 func readCredentials() Credentials {
-	raw, err := ioutil.ReadFile(CREDENTIALS_PATH + "/credentials.json")
+	raw, err := ioutil.ReadFile(CREDENTIALS_PATH)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -123,6 +123,7 @@ func readCredentials() Credentials {
 func getRandomFilms(categorie []string, date string) []Movie {
 	index_start := 0
 	movies := []Movie{}
+	changes := true
 	mappaCategorie_Indici := make(map[string][]int)
 	if len(categorie) < 1 { //Non ci sono filtri selezionati --> li metto tutti
 		for k, _ := range mappaCategorie {
@@ -145,21 +146,29 @@ func getRandomFilms(categorie []string, date string) []Movie {
 			if len(mappaCategorie_Indici[categoria_random]) < 1 { //Non ci sono film di una determinata categoria usciti dopo l'anno filtrato
 				continue
 			}
-			index_start = mappaCategorie_Indici[categoria_random][0]
-			index = random(0, index_max-index_start)
+			//index_start = mappaCategorie_Indici[categoria_random][0]
+			index = random(0, len(mappaCategorie_Indici[categoria_random])-1)
 			/*for _, v := range mappaCategorie_Indici[categoria_random] {
 				fmt.Println(v)
 			}
 			fmt.Println()*/
-			if mappaCategorie_Indici[categoria_random][index] == 0 {
+			if mappaCategorie_Indici[categoria_random][index] == -1 {
 				for j := 0; j < len(mappaCategorie_Indici[categoria_random]); j++ {
-					if mappaCategorie_Indici[categoria_random][j] != 0 {
+					if mappaCategorie_Indici[categoria_random][j] != -1 {
+						changes = true
 						index = mappaCategorie_Indici[categoria_random][j]
+						mappaCategorie_Indici[categoria_random][j] = -1
 						break
 					}
+					changes = false
+				}
+				if !changes {
+					return movies
 				}
 			} else {
-				mappaCategorie_Indici[categoria_random][index] = 0
+				temp := index
+				index = mappaCategorie_Indici[categoria_random][temp]
+				mappaCategorie_Indici[categoria_random][temp] = -1
 			}
 		} else {
 			index = random(index_start, index_max)
