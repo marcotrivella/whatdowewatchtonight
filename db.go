@@ -68,12 +68,6 @@ func INIT_DB() {
 }
 
 func loadFilms() {
-	/*movies := []Movie{}
-	query := "SELECT * FROM films.film"
-	if !date.IsZero() {
-		query += "WHERE film_date = " + date.String()
-	}
-	return movies*/
 	mappaCategorie = make(map[string][]Movie)
 	films := []Movie{}
 	log.Println("Query su film")
@@ -96,9 +90,9 @@ func loadFilms() {
 	log.Println("Test film casuali")
 	categorie := make([]string, 0)
 	/*categorie = append(categorie, "Horror")*/
-	categorie = append(categorie, "Avventura")
-	//categorie = append(categorie, "Western")
-	movies := getRandomFilms(categorie, "2017-01-01")
+	//categorie = append(categorie, "Avventura")
+	categorie = append(categorie, "Western")
+	movies := getRandomFilms(categorie, "2016-01-01")
 	for _, v := range movies {
 		fmt.Println(v.Title + " - " + v.Date)
 	}
@@ -121,57 +115,44 @@ func readCredentials() Credentials {
 }
 
 func getRandomFilms(categorie []string, date string) []Movie {
-	index_start := 0
 	movies := []Movie{}
 	changes := true
 	mappaCategorie_Indici := make(map[string][]int)
 	if len(categorie) < 1 { //Non ci sono filtri selezionati --> li metto tutti
-		for k, _ := range mappaCategorie {
-			categorie = append(categorie, k)
-		}
+		categorie = getCategorie()
 	}
 	if date != "" {
-		mappaCategorie_Indici = getAvailableIndex(categorie, date)
+		mappaCategorie_Indici = getAvailableIndex(categorie, date) //Prend gli indici della mappa dei film in memoria filtrata per data > a data inserita
 	}
-	/*for k, _ := range mappaCategorie_Indici {
-		for _, v := range mappaCategorie_Indici[k] {
-			fmt.Println(k + " - " + strconv.Itoa(v))
-		}
-	}*/
+
 	for i := 0; i < MAX_FILM_PAGE; i++ {
 		categoria_random := categorie[random(0, len(categorie)-1)]
-		index_max := len(mappaCategorie[categoria_random]) - 1
 		var index int
 		if date != "" {
 			if len(mappaCategorie_Indici[categoria_random]) < 1 { //Non ci sono film di una determinata categoria usciti dopo l'anno filtrato
 				continue
 			}
-			//index_start = mappaCategorie_Indici[categoria_random][0]
-			index = random(0, len(mappaCategorie_Indici[categoria_random])-1)
-			/*for _, v := range mappaCategorie_Indici[categoria_random] {
-				fmt.Println(v)
-			}
-			fmt.Println()*/
-			if mappaCategorie_Indici[categoria_random][index] == -1 {
+			index_temp := random(0, len(mappaCategorie_Indici[categoria_random])-1)
+
+			if mappaCategorie_Indici[categoria_random][index_temp] == -1 { //Controllo se ho gia usato il film all'indice index
 				for j := 0; j < len(mappaCategorie_Indici[categoria_random]); j++ {
 					if mappaCategorie_Indici[categoria_random][j] != -1 {
 						changes = true
 						index = mappaCategorie_Indici[categoria_random][j]
-						mappaCategorie_Indici[categoria_random][j] = -1
+						mappaCategorie_Indici[categoria_random][j] = -1 //Setto -1 nella mappa degli indici filtrati per sapere quali ho gia utilizzato
 						break
 					}
 					changes = false
 				}
 				if !changes {
-					return movies
+					return movies //Ho utilizzato tutti i film filtrati da una determinata data --> ritorno il vettore di film
 				}
 			} else {
-				temp := index
-				index = mappaCategorie_Indici[categoria_random][temp]
-				mappaCategorie_Indici[categoria_random][temp] = -1
+				index = mappaCategorie_Indici[categoria_random][index_temp]
+				mappaCategorie_Indici[categoria_random][index_temp] = -1 //Setto -1 nella mappa degli indici filtrati per sapere quali ho gia utilizzato
 			}
 		} else {
-			index = random(index_start, index_max)
+			index = random(0, len(mappaCategorie[categoria_random])-1)
 		}
 		movies = append(movies, mappaCategorie[categoria_random][index])
 	}
@@ -190,6 +171,15 @@ func getAvailableIndex(categorie []string, date string) map[string][]int {
 		mappa[categoria] = array_index
 	}
 	return mappa
+}
+
+func getCategorie() []string {
+	categorie := make([]string, 0)
+	for k, _ := range mappaCategorie {
+		categorie = append(categorie, k)
+	}
+
+	return categorie
 }
 
 func random(min int, max int) int {
