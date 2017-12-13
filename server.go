@@ -12,7 +12,7 @@ import (
 
 const (
 	TEMPLATE_PATH    = "static/html"
-	CREDENTIALS_PATH = "static/data"
+	CREDENTIALS_PATH = "static/data/credentials.json"
 	MAX_FILM_PAGE    = 50
 )
 
