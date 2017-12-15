@@ -37,7 +37,7 @@ func main() {
 
 func templateHandler(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/" {
-		serveTemplate(w, req, "example")
+		serveTemplate(w, req, "index")
 	} else {
 		return
 	}

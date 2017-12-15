@@ -64,7 +64,7 @@ func INIT_DB() {
 		log.Fatalln(err)
 	}
 
-	loadFilms()
+	//loadFilms()
 }
 
 func loadFilms() {
