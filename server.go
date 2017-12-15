@@ -17,6 +17,7 @@ const (
 )
 
 type Context struct {
+	Movies []Movie
 }
 
 var db *sqlx.DB
@@ -37,13 +38,15 @@ func main() {
 
 func templateHandler(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/" {
-		serveTemplate(w, req, "index")
+		serveTemplate(w, req, "index", Context{})
+	} else if req.URL.Path == "/" {
+
 	} else {
 		return
 	}
 }
 
-func serveTemplate(w http.ResponseWriter, r *http.Request, file_name string) {
+func serveTemplate(w http.ResponseWriter, r *http.Request, file_name string, context Context) {
 	lp := filepath.Join(TEMPLATE_PATH, "layout.html")
 	fp := filepath.Join(TEMPLATE_PATH, file_name+".html")
 
@@ -71,7 +74,7 @@ func serveTemplate(w http.ResponseWriter, r *http.Request, file_name string) {
 		return
 	}
 
-	if err := tmpl.ExecuteTemplate(w, "layout.html", Context{}); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "layout.html", context); err != nil {
 		log.Println(err.Error())
 		http.Error(w, http.StatusText(500), 500)
 	}

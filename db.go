@@ -64,7 +64,7 @@ func INIT_DB() {
 		log.Fatalln(err)
 	}
 
-	//loadFilms()
+	loadFilms()
 }
 
 func loadFilms() {
@@ -86,16 +86,6 @@ func loadFilms() {
 		}
 	}
 	log.Println("Finito di completare la mappa dei film in memoria")
-
-	log.Println("Test film casuali")
-	categorie := make([]string, 0)
-	/*categorie = append(categorie, "Horror")*/
-	//categorie = append(categorie, "Avventura")
-	categorie = append(categorie, "Western")
-	movies := getRandomFilms(categorie, "2016-01-01")
-	for _, v := range movies {
-		fmt.Println(v.Title + " - " + v.Date)
-	}
 }
 
 func getCredentialsFromFile() Credentials {
