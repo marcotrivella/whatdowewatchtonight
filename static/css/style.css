@@ -13,8 +13,10 @@ body {
     padding-top: 56px;
   }
 }
-.test{
+.locandinaFilm{
   float: left;
   margin-top: 5px;
   margin-bottom: 5px;
+  height: 231px;
+  width: 154px;
 }

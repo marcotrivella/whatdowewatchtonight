@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	TEMPLATE_PATH    = "static/html"
-	CREDENTIALS_PATH = "static/data/credentials.json"
-	MAX_FILM_PAGE    = 50
+	templatePath    = "static/html"
+	credentialsPath = "static/data/credentials.json"
+	maxFilmPage     = 50
 )
 
+//Context da passare al template html
 type Context struct {
 	Movies []Movie
 }
@@ -30,7 +31,7 @@ func main() {
 
 	http.HandleFunc("/", templateHandler)
 
-	INIT_DB()
+	initDB()
 
 	log.Println("Listening...")
 	http.ListenAndServe(":8080", nil)
@@ -38,17 +39,17 @@ func main() {
 
 func templateHandler(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/" {
-		serveTemplate(w, req, "index", Context{})
-	} else if req.URL.Path == "/" {
-
+		serveTemplate(w, req, "index", Context{Movies: getRandomFilmsFiltered(make([]string, 0), "")})
+	} else if req.URL.Path == "/films" {
+		getRandomFilms(w, req)
 	} else {
 		return
 	}
 }
 
-func serveTemplate(w http.ResponseWriter, r *http.Request, file_name string, context Context) {
-	lp := filepath.Join(TEMPLATE_PATH, "layout.html")
-	fp := filepath.Join(TEMPLATE_PATH, file_name+".html")
+func serveTemplate(w http.ResponseWriter, r *http.Request, fileName string, context Context) {
+	lp := filepath.Join(templatePath, "layout.html")
+	fp := filepath.Join(templatePath, fileName+".html")
 
 	// Return a 404 if the template doesn't exist
 	info, err := os.Stat(fp)
